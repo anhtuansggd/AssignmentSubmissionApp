@@ -1,10 +1,12 @@
 package com.spring.assigmentsubmissionapp.domain;
 
-import jakarta.persistence.*;
+
+import javax.persistence.*;
 
 @Entity //Entity will create table called "assignment" (based on class name)
 public class Assignment {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String status;
     private String githubUrl;
