@@ -1,0 +1,3 @@
+https://www.toptal.com/spring/spring-security-tutorial
+
+https://www.javadevjournal.com/spring-security/spring-security-authentication/
