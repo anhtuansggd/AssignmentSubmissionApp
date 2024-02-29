@@ -29,4 +29,8 @@ public class AssignmentService {
     public Optional<Assignment> findById(Long assignmentId) {
         return assignmentRepository.findById(assignmentId);
     }
+
+    public Assignment save(Assignment assignment){
+        return assignmentRepository.save(assignment);
+    }
 }
