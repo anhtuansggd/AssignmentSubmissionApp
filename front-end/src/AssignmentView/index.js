@@ -33,7 +33,7 @@ const AssignmentView = () => {
 
     }
 
-    function persist(){
+    function persist() {
         ajax(`/api/assignments/${assignmentId}`, "PUT", jwt, assignment).then(
             (assignmentData) => {
                 setAssignment(assignmentData);
@@ -64,6 +64,7 @@ const AssignmentView = () => {
 
     return (
         <Container className="mt-5">
+
             <Row className="d-flex align-items-center">
                 <Col>
                     {assignment.number ? <h1>Assignment {assignment.number}</h1> : <></>}

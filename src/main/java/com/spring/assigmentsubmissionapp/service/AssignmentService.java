@@ -15,7 +15,7 @@ public class AssignmentService {
     @Autowired
     private AssignmentRepository assignmentRepository;
 
-    public Assignment save(User user){
+    public Assignment save(User user) {
         Assignment assignment = new Assignment();
         assignment.setStatus(AssignmentStatusEnum.PENDING_SUBMISSION.getStatus());
         assignment.setNumber(findNextAssignmentToSubmit(user));
@@ -26,26 +26,26 @@ public class AssignmentService {
 
     private Integer findNextAssignmentToSubmit(User user) {
         Set<Assignment> assignmentsByUser = assignmentRepository.findByUser(user);
-        if(assignmentsByUser == null){
+        if (assignmentsByUser == null) {
             return 1;
         }
         Optional<Integer> nextAssignmentNumberOptional = assignmentsByUser.stream()
                 .sorted((a1, a2) -> {
-                    if(a1.getNumber() == null) return 1;
-                    if(a2.getNumber() == null) return 1;
+                    if (a1.getNumber() == null) return 1;
+                    if (a2.getNumber() == null) return 1;
                     return a2.getNumber().compareTo(a2.getNumber());
                 })
                 .limit(1)
                 .map(assignment ->
                 {
-                    if(assignment.getNumber() == null) return 1;
+                    if (assignment.getNumber() == null) return 1;
                     else return assignment.getNumber() + 1;
                 })
                 .findFirst();
         return nextAssignmentNumberOptional.orElse(1);
     }
 
-    public Set<Assignment> findByUser(User user){
+    public Set<Assignment> findByUser(User user) {
         return assignmentRepository.findByUser(user);
     }
 
@@ -53,7 +53,7 @@ public class AssignmentService {
         return assignmentRepository.findById(assignmentId);
     }
 
-    public Assignment save(Assignment assignment){
+    public Assignment save(Assignment assignment) {
         return assignmentRepository.save(assignment);
     }
 }

@@ -2,9 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {useLocalState} from "../util/useLocalStorage";
 import {Link, Navigate} from "react-router-dom";
 import ajax from "../Services/fetchService";
-import {Badge, Button, Card, Col, Row} from "react-bootstrap";
+import {Badge, Button, Card, Col, Container, Row} from "react-bootstrap";
 
-const Dashboard = () => {
+const CodeReviewerDashboard = () => {
     const [jwt, setJwt] = useLocalState("", "jwt");
     const [assignments, setAssignments] = useState(null);
 
@@ -23,26 +23,27 @@ const Dashboard = () => {
     }
 
     return (
-        <div style={{margin: '2em'}}>
+        <Container>
             <Row>
                 <Col>
                     <div
                         className="d-flex justify-content-end"
                         style={ {cursor: "pointer"} }
                         onClick={() => {
-                        setJwt(null);
-                        window.location.href = '/login';
-                    }}
+                            setJwt(null);
+                            window.location.href = '/login';
+                        }}
                     >
                         Logout
                     </div>
                 </Col>
+                <Row>
+                    <Col>
+                        <div className="h1">Code Reviewer Dashboard</div>
+                    </Col>
+                </Row>
             </Row>
-            <div className="mb-5">
-                <Button size="lg" onClick={() => createAssignment()}>
-                    Submit New Assignment
-                </Button>
-            </div>
+
 
             {assignments ? (
                 <div
@@ -72,8 +73,8 @@ const Dashboard = () => {
                 <></>
             )}
 
-        </div>
+        </Container>
     );
 };
 
-export default Dashboard;
+export default CodeReviewerDashboard;
