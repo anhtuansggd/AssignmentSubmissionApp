@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useLocalState} from "../util/useLocalStorage";
 import {json} from "react-router-dom";
 import ajax from "../Services/fetchService";
@@ -14,25 +14,38 @@ const AssignmentView = () => {
     });
     const [jwt, setJwt] = useLocalState("", "jwt");
     const [assignmentEnums, setAssignmentEnums] = useState([]);
-        const [assignmentStatuses, setAssignmentStatuses] = useState([]);
+    const [assignmentStatuses, setAssignmentStatuses] = useState([]);
 
-    async function updateAssignment(prop, value) {
+    const previousAssignmentValue = useRef(assignment);
+
+    function updateAssignment(prop, value) {
         const newAssignment = {...assignment};
         newAssignment[prop] = value;
-        await setAssignment(newAssignment);
+        setAssignment(newAssignment);
     }
 
     function save() {
-        //this implies that the student is submitting for the first time
-        console.log(`Status is ${assignment.status}`)
-        if(assignment.status === assignmentStatuses[0].status){
+        if (assignment.status === assignmentStatuses[0].status) {
             updateAssignment("status", assignmentStatuses[1].status);
+        } else {
+            persist();
         }
+
+    }
+
+    function persist(){
         ajax(`/api/assignments/${assignmentId}`, "PUT", jwt, assignment).then(
             (assignmentData) => {
                 setAssignment(assignmentData);
             });
     }
+
+    useEffect(() => {
+        if (previousAssignmentValue.current.status !== assignment.status) {
+            persist();
+        }
+        previousAssignmentValue.current = assignment;
+    }, [assignment]);
 
     useEffect(() => {
         ajax(`/api/assignments/${assignmentId}`, "GET", jwt).then(
