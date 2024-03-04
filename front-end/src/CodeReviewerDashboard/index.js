@@ -3,10 +3,29 @@ import {useLocalState} from "../util/useLocalStorage";
 import {Link, Navigate} from "react-router-dom";
 import ajax from "../Services/fetchService";
 import {Badge, Button, Card, Col, Container, Row} from "react-bootstrap";
+import {jwtDecode} from "jwt-decode";
 
 const CodeReviewerDashboard = () => {
     const [jwt, setJwt] = useLocalState("", "jwt");
     const [assignments, setAssignments] = useState(null);
+
+    function claimAssignment(assignment){
+        const decodedJwt = jwtDecode(jwt);
+        const user = {
+            username: decodedJwt.sub,
+        };
+        assignment.codeReviewer = user;
+        //Dont hardcode this status
+        assignment.status = "In Review";
+        ajax(`api/assignments/${assignment.id}`, "PUT", jwt, assignment).then(
+            (updatedAssignment) => {
+            //TODO: update the view for the assignment that changed
+            const assignmentCopy = [...assignments];
+            const i = assignmentCopy.findIndex(a => a.id=== assignment.id);
+            assignmentCopy[i] = updatedAssignment;
+            setAssignments(assignmentCopy);
+        })
+    }
 
     useEffect(() => {
         ajax("/api/assignments/", "GET", jwt)
@@ -70,8 +89,8 @@ const CodeReviewerDashboard = () => {
                                         <p><b>Branch:</b> {assignment.branch}</p>
                                     </Card.Text>
                                     <Button variant="secondary" onClick={() => {
-                                        window.location.href = `/assignments/${assignment.id}`;
-                                    }}>Edit</Button>
+                                        claimAssignment(assignment);
+                                    }}>Claim</Button>
                                 </Card.Body>
                             </Card>
                         ))}
