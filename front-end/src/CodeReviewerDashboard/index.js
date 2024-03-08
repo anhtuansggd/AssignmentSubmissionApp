@@ -8,7 +8,9 @@ import {jwtDecode} from "jwt-decode";
 const CodeReviewerDashboard = () => {
     const [jwt, setJwt] = useLocalState("", "jwt");
     const [assignments, setAssignments] = useState(null);
-
+    function editReview(assignment){
+        window.location.href = `/assignments/${assignment.id}`;
+    }
     function claimAssignment(assignment) {
         const decodedJwt = jwtDecode(jwt);
         const user = {
@@ -79,8 +81,8 @@ const CodeReviewerDashboard = () => {
                                             <p><b>Branch:</b> {assignment.branch}</p>
                                         </Card.Text>
                                         <Button variant="secondary" onClick={() => {
-                                            claimAssignment(assignment);
-                                        }}>Claim</Button>
+                                            editReview(assignment);
+                                        }}>Edit</Button>
                                     </Card.Body>
                                 </Card>
                             ))}
@@ -155,8 +157,8 @@ const CodeReviewerDashboard = () => {
                                     <p><b>Branch:</b> {assignment.branch}</p>
                                 </Card.Text>
                                 <Button variant="secondary" onClick={() => {
-                                    claimAssignment(assignment);
-                                }}>Claim</Button>
+                                    window.location.href=`/assignments/${assignment.id}`;
+                                }}>View</Button>
                             </Card.Body>
                         </Card>
                     ))}
