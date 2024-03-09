@@ -1,10 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useLocalState} from "../util/useLocalStorage";
-import {json} from "react-router-dom";
+import {json, useNavigate} from "react-router-dom";
 import ajax from "../Services/fetchService";
 import {Badge, Button, ButtonGroup, Col, Container, Dropdown, DropdownButton, Form, Row} from "react-bootstrap";
+import StatusBadge from "../StatusBadge";
 
 const AssignmentView = () => {
+    let navigate = useNavigate();
     const assignmentId = window.location.href.split("/assignments/")[1];
     const [assignment, setAssignment] = useState({
         branch: "",
@@ -24,9 +26,9 @@ const AssignmentView = () => {
         setAssignment(newAssignment);
     }
 
-    function save() {
-        if (assignment.status === assignmentStatuses[0].status) {
-            updateAssignment("status", assignmentStatuses[1].status);
+    function save(status) {
+        if (status && assignment.status !== status) {
+            updateAssignment("status", status);
         } else {
             persist();
         }
@@ -70,9 +72,7 @@ const AssignmentView = () => {
                     {assignment.number ? <h1>Assignment {assignment.number}</h1> : <></>}
                 </Col>
                 <Col>
-                    <Badge pill bg="info" style={{fontSize: "1em"}}>
-                        {assignment.status}
-                    </Badge>
+                    <StatusBadge text={assignment.status}/>
                 </Col>
             </Row>
 
@@ -114,12 +114,25 @@ const AssignmentView = () => {
                     </Col>
                 </Form.Group>
 
+                <Form.Group as={Row} className="my-4" controlId="branch">
+                    <Form.Label column sm="3" md="2">
+                        Github URL:
+                    </Form.Label>
+                    <Col sm="9" md="8" lg="6">
+                        <Form.Control
+                            onChange={(event) =>
+                                updateAssignment("branch", event.target.value)}
+                            value={assignment.branch}
+                            type="url" placeholder="example_branch"/>
+                    </Col>
+                </Form.Group>
 
 
                 {assignment.status === "Completed" ? (
                     <>
                         <div>
-                            <Form.Group as={Row} className="d-flex align-items-center mb-3" controlId="codeReviewVideoUrl">
+                            <Form.Group as={Row} className="d-flex align-items-center mb-3"
+                                        controlId="codeReviewVideoUrl">
                                 <Form.Label column sm="3" md="2">
                                     Code Review Video URL:
                                 </Form.Label>
@@ -130,19 +143,24 @@ const AssignmentView = () => {
                                 </Col>
                             </Form.Group>
                         </div>
-                        <div className="d-flex gap-5" >
+                        <div className="d-flex gap-5">
                             <Button size="lg" variant="secondary"
-                                    onClick={() => window.location.href = "/dashboard"}>Back</Button>
+                                    onClick={() => navigate("/dashboard")}>Back</Button>
                         </div>
                     </>
 
-                ) : (
+                ) : assignment.status === "Pending Submission" ? (
                     <div className="d-flex gap-5">
-                        <Button size="lg" onClick={() => save()}>Submit Assignment</Button>
+                        <Button size="lg" onClick={() => save("Submitted")}>Submit Assignment</Button>
                         <Button size="lg" variant="secondary"
-                                onClick={() => window.location.href = "/dashboard"}>Back</Button>
-                    </div>)
-                }
+                                onClick={() => navigate("/dashboard")}>Back</Button>
+                    </div>) : (
+                    <div className="d-flex gap-5">
+                        <Button size="lg" onClick={() => save("Resubmitted")}>Resubmit Assignment</Button>
+                        <Button size="lg" variant="secondary"
+                                onClick={() => navigate("/dashboard")}>Back</Button>
+                    </div>
+                )}
 
             </> : <></>}
 

@@ -1,10 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useLocalState} from "../util/useLocalStorage";
-import {json} from "react-router-dom";
+import {json, useNavigate} from "react-router-dom";
 import ajax from "../Services/fetchService";
 import {Badge, Button, ButtonGroup, Col, Container, Dropdown, DropdownButton, Form, Row} from "react-bootstrap";
+import StatusBadge from "../StatusBadge";
 
 const CodeReviewAssignmentView = () => {
+    let navigate = useNavigate();
     const assignmentId = window.location.href.split("/assignments/")[1];
     const [assignment, setAssignment] = useState({
         branch: "",
@@ -70,9 +72,7 @@ const CodeReviewAssignmentView = () => {
                     {assignment.number ? <h1>Assignment {assignment.number}</h1> : <></>}
                 </Col>
                 <Col>
-                    <Badge pill bg="info" style={{fontSize: "1em"}}>
-                        {assignment.status}
-                    </Badge>
+                    <StatusBadge text={assignment.status}/>
                 </Col>
             </Row>
 
@@ -147,7 +147,7 @@ const CodeReviewAssignmentView = () => {
                 }
                 <Button size="lg"
                         variant="secondary"
-                        onClick={() => window.location.href = "/dashboard"}>Back</Button>
+                        onClick={() =>  navigate("/dashboard")}>Back</Button>
             </div>
 
         </Container>

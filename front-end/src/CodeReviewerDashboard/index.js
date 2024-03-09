@@ -1,16 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import {useLocalState} from "../util/useLocalStorage";
-import {Link, Navigate} from "react-router-dom";
+import {Link, Navigate, useNavigate} from "react-router-dom";
 import ajax from "../Services/fetchService";
 import {Badge, Button, Card, Col, Container, Row} from "react-bootstrap";
 import {jwtDecode} from "jwt-decode";
+import StatusBadge from "../StatusBadge";
 
 const CodeReviewerDashboard = () => {
+    let navigate = useNavigate();
     const [jwt, setJwt] = useLocalState("", "jwt");
     const [assignments, setAssignments] = useState(null);
-    function editReview(assignment){
+
+    function editReview(assignment) {
         window.location.href = `/assignments/${assignment.id}`;
     }
+
     function claimAssignment(assignment) {
         const decodedJwt = jwtDecode(jwt);
         const user = {
@@ -45,7 +49,7 @@ const CodeReviewerDashboard = () => {
                         style={{cursor: "pointer"}}
                         onClick={() => {
                             setJwt(null);
-                            window.location.href = '/login';
+                            navigate('/login');
                         }}
                     >
                         Logout
@@ -62,7 +66,7 @@ const CodeReviewerDashboard = () => {
                 <div className="h3 px-2 assignment-wrapper-title">
                     In Review
                 </div>
-                {assignments  && assignments.filter((assignment) => assignment.status === "In Review").length > 0 ? (
+                {assignments && assignments.filter((assignment) => assignment.status === "In Review").length > 0 ? (
                     <div
                         className="d-grid gap-5"
                         style={{gridTemplateColumns: "repeat(auto-fill, 18rem)"}}>
@@ -72,9 +76,7 @@ const CodeReviewerDashboard = () => {
                                     <Card.Body className="d-flex flex-column justify-content-around">
                                         <Card.Title>Assignment #{assignment.number}</Card.Title>
                                         <div className="d-flex align-items-start">
-                                            <Badge pill bg="info" className="" style={{fontSize: "1em"}}>
-                                                {assignment.status}
-                                            </Badge>
+                                            <StatusBadge text={assignment.status}/>
                                         </div>
                                         <Card.Text style={{marginTop: "1em"}}>
                                             <p><b>Github URL:</b> {assignment.githubUrl}</p>
@@ -100,19 +102,22 @@ const CodeReviewerDashboard = () => {
                 <div className="h3 px-2 assignment-wrapper-title">
                     Awaiting Review
                 </div>
-                {assignments && assignments.filter((assignment) => assignment.status === "Submitted").length > 0  ? (
+                {assignments && assignments.filter((assignment) => assignment.status === "Submitted" || assignment.status === "Resubmitted").length > 0 ? (
                     <div
                         className="d-grid gap-5"
                         style={{gridTemplateColumns: "repeat(auto-fill, 18rem)"}}>
-                        {assignments.filter((assignment) => assignment.status === "Submitted")
+                        {assignments.filter((assignment) => assignment.status === "Submitted" || assignment.status === "Resubmitted")
+                            .sort((a,b) => {
+                                if(a.status === "Resubmitted")
+                                return -1;
+                                else return 1;
+                            })
                             .map(assignment => (
                                 <Card key={assignment.id} style={{width: '18rem', height: '18rem'}}>
                                     <Card.Body className="d-flex flex-column justify-content-around">
                                         <Card.Title>Assignment #{assignment.number}</Card.Title>
                                         <div className="d-flex align-items-start">
-                                            <Badge pill bg="info" className="" style={{fontSize: "1em"}}>
-                                                {assignment.status}
-                                            </Badge>
+                                            <StatusBadge text={assignment.status}/>
                                         </div>
                                         <Card.Text style={{marginTop: "1em"}}>
                                             <p><b>Github URL:</b> {assignment.githubUrl}</p>
@@ -140,40 +145,38 @@ const CodeReviewerDashboard = () => {
                 </div>
                 {assignments && assignments.filter((assignment) => assignment.status === "Needs Update").length > 0 ? (
                     <div
-                    className="d-grid gap-5"
-                    style={{gridTemplateColumns: "repeat(auto-fill, 18rem)"}}>
-                {assignments.filter((assignment) => assignment.status === "Needs Update")
+                        className="d-grid gap-5"
+                        style={{gridTemplateColumns: "repeat(auto-fill, 18rem)"}}>
+                        {assignments.filter((assignment) => assignment.status === "Needs Update")
                             .map(assignment => (
-                        <Card key={assignment.id} style={{width: '18rem', height: '18rem'}}>
-                            <Card.Body className="d-flex flex-column justify-content-around">
-                                <Card.Title>Assignment #{assignment.number}</Card.Title>
-                                <div className="d-flex align-items-start">
-                                    <Badge pill bg="info" className="" style={{fontSize: "1em"}}>
-                                        {assignment.status}
-                                    </Badge>
-                                </div>
-                                <Card.Text style={{marginTop: "1em"}}>
-                                    <p><b>Github URL:</b> {assignment.githubUrl}</p>
-                                    <p><b>Branch:</b> {assignment.branch}</p>
-                                </Card.Text>
-                                <Button variant="secondary" onClick={() => {
-                                    window.location.href=`/assignments/${assignment.id}`;
-                                }}>View</Button>
-                            </Card.Body>
-                        </Card>
-                    ))}
+                                <Card key={assignment.id} style={{width: '18rem', height: '18rem'}}>
+                                    <Card.Body className="d-flex flex-column justify-content-around">
+                                        <Card.Title>Assignment #{assignment.number}</Card.Title>
+                                        <div className="d-flex align-items-start">
+                                            <StatusBadge text={assignment.status}/>
+                                        </div>
+                                        <Card.Text style={{marginTop: "1em"}}>
+                                            <p><b>Github URL:</b> {assignment.githubUrl}</p>
+                                            <p><b>Branch:</b> {assignment.branch}</p>
+                                        </Card.Text>
+                                        <Button variant="secondary" onClick={() => {
+                                            window.location.href = `/assignments/${assignment.id}`;
+                                        }}>View</Button>
+                                    </Card.Body>
+                                </Card>
+                            ))}
+                    </div>
+                ) : (
+                    <div>
+                        No assignments found
+                    </div>
+                )}
             </div>
-            ) : (
-            <div>
-                No assignments found
-            </div>
-            )}
-        </div>
 
 
-</Container>
-)
-    ;
+        </Container>
+    )
+        ;
 };
 
 export default CodeReviewerDashboard;
