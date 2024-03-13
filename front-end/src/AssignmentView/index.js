@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useLocalState} from "../util/useLocalStorage";
-import {json, useNavigate} from "react-router-dom";
+import {json, useNavigate, useParams} from "react-router-dom";
 import ajax from "../Services/fetchService";
 import {Badge, Button, ButtonGroup, Col, Container, Dropdown, DropdownButton, Form, Row} from "react-bootstrap";
 import StatusBadge from "../StatusBadge";
@@ -9,7 +9,7 @@ import {useUser} from "../UserProvider";
 const AssignmentView = () => {
     let navigate = useNavigate();
     const user = useUser();
-    const assignmentId = window.location.href.split("/assignments/")[1];
+    const { assignmentId } = useParams();
     const [assignment, setAssignment] = useState({
         branch: "",
         githubUrl: "",
@@ -21,7 +21,7 @@ const AssignmentView = () => {
     const [assignmentStatuses, setAssignmentStatuses] = useState([]);
     const [comment, setComment] = useState({
         text: "",
-        assignment: assignmentId,
+        assignmentId: assignmentId != null ? parseInt(assignmentId) : null,
         user: user.jwt,
     });
 
