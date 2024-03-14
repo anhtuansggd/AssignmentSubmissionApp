@@ -1,6 +1,7 @@
 package com.spring.assigmentsubmissionapp.repository;
 
 import com.spring.assigmentsubmissionapp.domain.Assignment;
+import com.spring.assigmentsubmissionapp.domain.Comment;
 import com.spring.assigmentsubmissionapp.domain.User;
 import com.spring.assigmentsubmissionapp.enums.AssignmentStatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +17,5 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
             "WHERE (a.status = 'Submitted') AND  (a.codeReviewer is NULL OR a.codeReviewer = :codeReviewer)" +
             "OR a.codeReviewer = :codeReviewer")
     Set<Assignment> findByCodeReviewer(User codeReviewer);
+
 }

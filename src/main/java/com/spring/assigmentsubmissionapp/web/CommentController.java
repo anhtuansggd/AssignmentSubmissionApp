@@ -7,10 +7,9 @@ import com.spring.assigmentsubmissionapp.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -21,5 +20,11 @@ public class CommentController {
     public ResponseEntity<Comment>createComment(@RequestBody CommentDto commentDto, @AuthenticationPrincipal User user){
         Comment comment = commentService.save(commentDto, user);
         return ResponseEntity.ok(comment);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<Set<Comment>> getCommentsByAssignment(@RequestParam Long assignmentId){
+        Set<Comment> comments = commentService.getCommentsByAssignmentId(assignmentId);
+        return ResponseEntity.ok(comments);
     }
 }

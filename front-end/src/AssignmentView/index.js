@@ -24,14 +24,23 @@ const AssignmentView = () => {
         assignmentId: assignmentId != null ? parseInt(assignmentId) : null,
         user: user.jwt,
     });
+    const [comments, setComments] = useState([]);
 
     const previousAssignmentValue = useRef(assignment);
 
     function submitComment(){
-        ajax(`/api/comments`, 'post', user.jwt, comment).then((data)=>{
-            console.log(data);
+        ajax(`/api/comments`, 'post', user.jwt, comment).then((commentData)=>{
+            const commentsCopy = [...comments];
+            commentsCopy.push(commentData);
+            setComments(commentsCopy);
         });
     }
+
+    useEffect(() => {
+        ajax(`/api/comments?assignmentId=${assignmentId}`, "get", user.jwt, null).then((commentsData) => {
+            setComments(commentsData);
+        });
+    }, [])
 
     function updateComment(value){
         const commentCopy = {...comment}
@@ -39,9 +48,7 @@ const AssignmentView = () => {
         setComment(commentCopy);
     }
 
-    useEffect(() => {
-        console.log(comment);
-    }, [comment])
+
 
     function updateAssignment(prop, value) {
         const newAssignment = {...assignment};
@@ -190,6 +197,11 @@ const AssignmentView = () => {
                               onChange={(event) => updateComment(event.target.value)}
                     ></textarea>
                     <Button onClick={() => submitComment()}>Post Comment</Button>
+                </div>
+                <div className="mt-5">
+                    {comments.map((comment) =>
+                        <div><span style={{fontWeight: 'bold'}}>{`[${comment.createdDate}] ${comment.createdBy.name}` }:{" "}</span>{`${comment.text}`}</div>
+                    )}
                 </div>
 
             </> : <></>}
