@@ -5,11 +5,12 @@ import ajax from "../Services/fetchService";
 import {Badge, Button, ButtonGroup, Col, Container, Dropdown, DropdownButton, Form, Row} from "react-bootstrap";
 import StatusBadge from "../StatusBadge";
 import {useUser} from "../UserProvider";
+import Comment from "../Comment";
 
 const AssignmentView = () => {
     let navigate = useNavigate();
     const user = useUser();
-    const { assignmentId } = useParams();
+    const {assignmentId} = useParams();
     const [assignment, setAssignment] = useState({
         branch: "",
         githubUrl: "",
@@ -17,23 +18,54 @@ const AssignmentView = () => {
         status: null,
     });
     const [jwt, setJwt] = useLocalState("", "jwt");
-    const [assignmentEnums, setAssignmentEnums] = useState([]);
-    const [assignmentStatuses, setAssignmentStatuses] = useState([]);
-    const [comment, setComment] = useState({
+    const emptyComment = {
+        id: null,
         text: "",
         assignmentId: assignmentId != null ? parseInt(assignmentId) : null,
         user: user.jwt,
-    });
+    }
+    const [assignmentEnums, setAssignmentEnums] = useState([]);
+    const [assignmentStatuses, setAssignmentStatuses] = useState([]);
+    const [comment, setComment] = useState(emptyComment);
     const [comments, setComments] = useState([]);
 
     const previousAssignmentValue = useRef(assignment);
 
-    function submitComment(){
-        ajax(`/api/comments`, 'post', user.jwt, comment).then((commentData)=>{
-            const commentsCopy = [...comments];
-            commentsCopy.push(commentData);
-            setComments(commentsCopy);
-        });
+    function handleEditComment(commentId) {
+        const i = comments.findIndex((comment) => comment.id === commentId);
+        const commentCopy = {
+            id: comments[i].id,
+            text: comments[i].text,
+            assignmentId: assignmentId != null ? parseInt(assignmentId) : null,
+            user: user.jwt,
+        }
+        setComment(commentCopy);
+    }
+
+    function handleDeleteComment(commentId) {
+        //TODO: sent DEL request to server
+        console.log("Del this comment:" + comment);
+    }
+
+    function submitComment() {
+        if (comment.id) {
+            ajax(`/api/comments/${comment.id}`, "put", user.jwt, comment).then(
+                (d) => {
+                    const commentsCopy = [...comments];
+                    const i = commentsCopy.findIndex((comment) => comment.id === d.id);
+                    commentsCopy[i] = d;
+                    setComments(commentsCopy);
+                    setComment(emptyComment);
+                });
+        } else {
+            ajax(`/api/comments`, 'post', user.jwt, comment).then((d) => {
+                const commentsCopy = [...comments];
+                commentsCopy.push(d);
+                setComments(commentsCopy);
+                setComment(emptyComment);
+            });
+        }
+
     }
 
     useEffect(() => {
@@ -42,12 +74,11 @@ const AssignmentView = () => {
         });
     }, [])
 
-    function updateComment(value){
+    function updateComment(value) {
         const commentCopy = {...comment}
         commentCopy.text = value;
         setComment(commentCopy);
     }
-
 
 
     function updateAssignment(prop, value) {
@@ -195,12 +226,19 @@ const AssignmentView = () => {
                 <div className="mt-5">
                     <textarea style={{width: "100%", borderRadius: "0.25em"}}
                               onChange={(event) => updateComment(event.target.value)}
+                              value={comment.text}
                     ></textarea>
                     <Button onClick={() => submitComment()}>Post Comment</Button>
                 </div>
                 <div className="mt-5">
                     {comments.map((comment) =>
-                        <div><span style={{fontWeight: 'bold'}}>{`[${comment.createdDate}] ${comment.createdBy.name}` }:{" "}</span>{`${comment.text}`}</div>
+                        <Comment createdDate={comment.createdDate}
+                                 createdBy={comment.createdBy}
+                                 text={comment.text}
+                                 emitDeleteComment={handleDeleteComment}
+                                 emitEditComment={handleEditComment}
+                                 id={comment.id}
+                        ></Comment>
                     )}
                 </div>
 
@@ -209,6 +247,7 @@ const AssignmentView = () => {
 
         </Container>
     );
-};
+}
+    ;
 
-export default AssignmentView;
+    export default AssignmentView;
