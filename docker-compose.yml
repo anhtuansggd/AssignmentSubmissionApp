@@ -1,0 +1,29 @@
+services:
+  back-end:
+    build:
+      context: back-end
+      dockerfile: Dockerfile
+    ports: 
+      - 8081:8081
+    environment:
+      - DB_URL=jdbc:postgresql://dbcontainer:5432/assignment_submission_db
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+    depends_on:
+      - dbcontainer
+  front-end:
+    build:
+      context: front-end
+      dockerfile: Dockerfile
+    ports:
+      - 80:3000
+    depends_on:
+      - back-end
+  dbcontainer:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: 'admin'
+      POSTGRES_PASSWORD: 'admin'
+      POSTGRES_DB: 'assignment_submission_db'
+
+#PERSISTENT

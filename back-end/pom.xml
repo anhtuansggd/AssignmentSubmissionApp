@@ -11,7 +11,7 @@
 	<groupId>com.spring</groupId>
 	<artifactId>AssigmentSubmissionApp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>AssigmentSubmissionApp</name>
 	<description>AssigmentSubmissionApp</description>
 	<properties>

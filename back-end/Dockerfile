@@ -22,7 +22,7 @@ COPY src src
 
 # Package the application
 RUN ./mvnw package -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+RUN mkdir -p target/dependency && (cd target/dependency; jar -xvf ../*.jar)
 
 
 #### Stage 2: A minimal docker image with command to run the app
@@ -30,9 +30,16 @@ FROM openjdk:17-jdk-slim
 
 ARG DEPENDENCY=/app/target/dependency
 
+RUN if [ -d "${DEPENDENCY}" ]; then ls -la ${DEPENDENCY}; else echo "${DEPENDENCY} does not exist"; fi
+
 # Copy project dependencies from the build stage
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.spring.assignmentsubmissionapp"]
+ENTRYPOINT ["java","-cp","app:app/lib/*","com.spring.assignmentsubmissionapp.AssignmentSubmissionAppApplication"]
+
+### docker build -t back-end .
+### docker run -i --entrypoint /bin/sh -p 8081:8081 --network db-network --name bContainer back-end
+### java -cp app:app/lib/* com.spring.assignmentsubmissionapp.AssignmentSubmissionAppApplication
+###  docker run -it --name dbcontainer -e POSTGRES_PASSWORD=admin -e POSTGRES_USER=admin -e POSTGRES_DB=assignment_submission_db --network db-network -p 5432:5432 -d postgres:13-alpine
