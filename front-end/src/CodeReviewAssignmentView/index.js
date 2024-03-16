@@ -4,6 +4,7 @@ import {json, useNavigate} from "react-router-dom";
 import ajax from "../Services/fetchService";
 import {Badge, Button, ButtonGroup, Col, Container, Dropdown, DropdownButton, Form, Row} from "react-bootstrap";
 import StatusBadge from "../StatusBadge";
+import CommentContainer from "../CommentContainer";
 
 const CodeReviewAssignmentView = () => {
     let navigate = useNavigate();
@@ -149,6 +150,10 @@ const CodeReviewAssignmentView = () => {
                         variant="secondary"
                         onClick={() =>  navigate("/dashboard")}>Back</Button>
             </div>
+
+
+
+            <CommentContainer assignmentId = {assignmentId}/>
 
         </Container>
     );

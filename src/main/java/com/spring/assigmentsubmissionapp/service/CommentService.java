@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.spring.assigmentsubmissionapp.repository.CommentRepository;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -28,8 +28,11 @@ public class CommentService {
         comment.setText(commentDto.getText());
         comment.setCreatedBy(user);
         if(comment.getId() == null){
-            comment.setCreatedDate(LocalDateTime.now());
+            comment.setCreatedDate(ZonedDateTime.now());
+        }else{
+            comment.setCreatedDate(commentDto.getCreatedDate());
         }
+
 
         return commentRepository.save(comment);
     }
@@ -37,5 +40,9 @@ public class CommentService {
     public Set<Comment> getCommentsByAssignmentId(Long assignmentId){
         Set<Comment> comments = commentRepository.findByAssignmentId(assignmentId);
         return comments;
+    }
+
+    public void delete(Long commentId) {
+        commentRepository.deleteById(commentId);
     }
 }
