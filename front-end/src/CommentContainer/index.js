@@ -5,6 +5,7 @@ import {useUser} from "../UserProvider";
 import Comment from "../Comment";
 import dayjs from "dayjs";
 import {type} from "@testing-library/user-event/dist/type";
+import {useInterval} from "../util/useInterval";
 
 const CommentContainer = (props) => {
     const {assignmentId} = props;
@@ -31,9 +32,17 @@ const CommentContainer = (props) => {
         setComment(commentCopy);
     }
 
-    useEffect(()=>{
+    useInterval(() => {
+        updateCommentTimeDisplay();
+    }, 1000 * 5);
 
-    }, [comment]);
+    function updateCommentTimeDisplay() {
+        const commentsCopy = [...comments];
+        commentsCopy.forEach(
+            (comment) => (comment.createdDate = dayjs(comment.createdDate))
+        );
+        formatComments(commentsCopy);
+    }
 
     function handleDeleteComment(commentId) {
        ajax(`/api/comments/${commentId}`, "delete", user.jwt).then((msg) => {

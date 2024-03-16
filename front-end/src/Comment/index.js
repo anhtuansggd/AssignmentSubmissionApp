@@ -7,12 +7,19 @@ import relativeTime from "dayjs/plugin/relativeTime"
 const Comment = (props) => {
     const user = useUser();
     const decodedJwt = jwtDecode(user.jwt);
+    const [refreshInterval, setRefreshInterval] = useState(null);
     const {id, emitEditComment, createdDate, createdBy, text, emitDeleteComment} = props;
     const [commentRelativeTime, setCommentRelativeTime] = useState("");
 
     useEffect(() => {
         updateCommentRelativeTime();
     }, [createdDate]);
+
+    if(!refreshInterval){
+        setRefreshInterval(setInterval(() => {
+            updateCommentRelativeTime();
+        }, 1000*5));
+    }
 
     function updateCommentRelativeTime(){
         if(createdDate){
@@ -21,9 +28,6 @@ const Comment = (props) => {
         }
     }
 
-    setInterval(() => {
-        updateCommentRelativeTime();
-    }, 1000*61);
 
 
     return (
