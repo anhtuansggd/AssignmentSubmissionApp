@@ -122,7 +122,7 @@ const AssignmentView = () => {
 
                     <Form.Group as={Row} className="my-4" controlId="branch">
                         <Form.Label column sm="3" md="2">
-                            Github URL:
+                            Branch:
                         </Form.Label>
                         <Col sm="9" md="8" lg="6">
                             <Form.Control
